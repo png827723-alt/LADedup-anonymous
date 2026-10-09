@@ -1,0 +1,59 @@
+# ==========================================
+# Distributed Dedup - Manager Config
+# ==========================================
+
+distributed_enabled: true
+role: manager
+
+# --- Dedup settings ---
+storage_granularity: block   # block | container
+chunking_method: fastcdc         # fixed | fastcdc
+chunk_size: 4096
+
+container_data_size: 4194304
+meta_reserved_size: 32768
+cache_size: 5
+single_file_mode: true
+block_cache_size: 1280
+
+# Manager doesn't store chunks locally; only recipes + global metadata
+recipe_path: ./recipes
+stats_path: ./stats
+global_meta_path: ./global_meta.json
+
+# --- RPC / placement settings ---
+placement_strategy: round_robin  # round_robin | random
+# Optional: placement table directory.
+# If the directory exists, manager will look for mapping tables of "chunk_hash -> edge_node_id"
+# under it (JSON or text/CSV). If the directory does not exist, manager distributes all chunks
+# by placement_strategy.
+# If the directory exists, only mapped+resolvable chunks are written to edge.
+# Unmapped/unresolvable chunks are skipped (strict mode, no fallback).
+# Optional: explicit placement JSON file path (has higher priority than placement_dir).
+# Supports either:
+#   - {"<chunk_hash>":"<edge_node_id_or_number>", ...}
+#   - {"hash2edge_node_id": {"<chunk_hash>": <edge_node_id_or_number>, ...}, ...}
+placement_json: ""
+placement_dir: ./placement
+cloud_chunk_replication: false
+dedup_mode: synthetic_edge
+dedup_batch_size: 128
+restore_batch_size: 256
+restore_window_size: 4096
+# 当一个文件中“不在边缘节点”的块数量 >= 阈值时，
+# manager 将跳过 edge 拉取，直接从 cloud 全量恢复该文件（无回退）。
+restore_cloud_full_threshold: 1
+# true: 恢复成功后不落盘到 output，只要求完成重组
+restore_discard_output: true
+rpc_timeout_ms: 5000
+rpc_max_message_bytes: 67108864
+
+edge_nodes:
+  - id: edge1
+    addr: 127.0.0.1:50051
+  - id: edge2
+    addr: 127.0.0.1:50052
+
+cloud_node:
+  id: cloud
+  addr: 127.0.0.1:50060
