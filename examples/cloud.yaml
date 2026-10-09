@@ -1,0 +1,25 @@
+# ==========================================
+# Distributed Dedup - Cloud Node (reliable backup)
+# ==========================================
+
+distributed_enabled: true
+role: cloud
+node_id: cloud
+listen_addr: :50060
+
+storage_granularity: container
+chunking_method: fastcdc
+chunk_size: 4096
+
+container_data_size: 4194304
+meta_reserved_size: 32768
+cache_size: 8
+single_file_mode: true
+block_cache_size: 1280
+
+persist_data: true
+load_previous_index: true
+dedup_mode: synthetic_edge
+
+storage_path: /tmp/dedup_cloud/storage
+meta_path: /tmp/dedup_cloud/meta.json
