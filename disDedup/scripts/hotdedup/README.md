@@ -1,1 +1,0 @@
-go run main.go -in input.json -out out.json -prizeScale 1000 -roots 10
